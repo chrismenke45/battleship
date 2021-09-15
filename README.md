@@ -1,0 +1,1 @@
+This project is to get practice with test driven development (TDD) and making some pure functions.  It will be a fully operational battleshipgame when finished. 
