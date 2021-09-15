@@ -1,4 +1,4 @@
-function ship(shipLength, shipName) {
+export function ship(shipLength, shipName) {
   if ((typeof shipLength) !== 'number') {
     throw ('Put number for 1st Argument')
   }
@@ -28,4 +28,4 @@ function ship(shipLength, shipName) {
   }
     return boat;
   }
-  module.exports = ship;
+  //module.exports = ship;
