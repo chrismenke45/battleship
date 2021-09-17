@@ -1,0 +1,29 @@
+:root {
+    color: black;
+    font-family: 'Courier New', Courier, monospace;
+}
+.board {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(10, 1fr);
+    height: 300px;
+    width: 300px;
+
+}
+.boardSquare {
+    border: 1px solid #000;
+}
+#boardArea {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+.shipON {
+    background-color: red;
+}
+.hitShip {
+    background-color: red !important; 
+}
+.occupied {
+    background-color: blue;
+}
