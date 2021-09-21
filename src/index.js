@@ -9,6 +9,7 @@ const computerBoardArea = document.getElementById('computerBoardArea');
 const computerSide = document.getElementById('computerSide');
 let playerCaption = document.getElementById('playerCaption');
 let computerCaption = document.getElementById('computerCaption');
+let rotateBtn = document.getElementById('rotate');
 
 let cargo = ship(4, 'Cargo Ship');
 let patrol = ship(2, 'Patrol Boat');
@@ -77,32 +78,61 @@ boats.forEach(boat => {
 })*/
 
 let shipsPlaced = 0;
+let rotation = 'vertical';
+
+rotateBtn.addEventListener('click', () => {
+    if (rotation == 'vertical') {
+        rotation = 'horizontal';
+    } else {
+        rotation = 'vertical';
+    }
+})
+
 
 playerSquares.forEach(square => square.addEventListener('mouseenter', () => {
     if (shipsPlaced < boats.length) {
-        for (let u = 0; u < boats[shipsPlaced].shipLength; u++) {
-            if (Number(square.id) + u * 10 >= 100) {
-                break;
+        if (rotation == 'vertical') {
+            for (let u = 0; u < boats[shipsPlaced].shipLength; u++) {
+                if (Number(square.id) + u * 10 >= 100) {
+                    break;
+                }
+                playerSquares[Number(square.id) + u * 10].classList.add('thinking')
             }
-            playerSquares[Number(square.id) + u * 10].classList.add('thinking')
+        } else if (rotation == 'horizontal') {
+            for (let u = 0; u < boats[shipsPlaced].shipLength; u++) {
+                if (Math.floor((Number(square.id) + u) / 10) !== Math.floor(Number(square.id) / 10)) {
+                    break;
+                }
+                playerSquares[Number(square.id) + u].classList.add('thinking')
+            }
         }
     }
 }))
 playerSquares.forEach(square => square.addEventListener('mouseleave', () => {
     if (shipsPlaced < boats.length) {
-        for (let u = 0; u < boats[shipsPlaced].shipLength; u++) {
-            if (Number(square.id) + u * 10 >= 100) {
-                break;
+        if (rotation == 'vertical') {
+            for (let u = 0; u < boats[shipsPlaced].shipLength; u++) {
+                if (Number(square.id) + u * 10 >= 100) {
+                    break;
+                }
+                playerSquares[Number(square.id) + u * 10].classList.remove('thinking')
             }
-            playerSquares[Number(square.id) + u * 10].classList.remove('thinking')
+        } else if (rotation == 'horizontal') {
+            for (let u = 0; u < boats[shipsPlaced].shipLength; u++) {
+                if (Math.floor((Number(square.id) + u) / 10) !== Math.floor(Number(square.id) / 10)) {
+                    break;
+                }
+                playerSquares[Number(square.id) + u].classList.remove('thinking')
+            }
         }
+
     }
 }))
 playerCaption.innerHTML = 'Place your ' + boats[shipsPlaced].shipName;
 playerSquares.forEach(square => square.addEventListener('click', () => {
     if (shipsPlaced < boats.length) {
-        if (playerBoard.availablePlacement((Number(square.id)), boats[shipsPlaced].shipLength, 'vertical')) {
-            playerBoard.place((Number(square.id)), boats[shipsPlaced].shipLength, 'vertical', boats[shipsPlaced].shipname);
+        if (playerBoard.availablePlacement((Number(square.id)), boats[shipsPlaced].shipLength, rotation)) {
+            playerBoard.place((Number(square.id)), boats[shipsPlaced].shipLength, rotation, boats[shipsPlaced].shipname);
             playerBoard.spots.forEach((spot, index) => {
                 if (spot.occupied) {
                     playerSquares[index].classList.add('occupied');
