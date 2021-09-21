@@ -1,21 +1,27 @@
 const ship = require('./ship');
 
-test.skip('check it makes hit areas', () => {
-  expect(ship(1, 'cargo').hit1).toBe(false);
+
+test('check it makes hit areas', () => {
+  let boat = ship(3, 'cargo')
+  boat.hit()
+  expect(boat.hits).toBe(1);
 });
-test.skip('check it makes multiple hit areas', () => {
-  expect(ship(2, 'cargo').hit1).toBe(false);
-  expect(ship(2, 'cargo').hit2).toBe(false);
+test('check it makes multiple hit areas', () => {
+  let boat = ship(3, 'cargo')
+  boat.hit()
+  boat.hit()
+  expect(boat.hits).toBe(2);
 });
-test.skip('check sunk method works if not sunk', () => {
-  let yee = ship(2, 'cargo')
-  yee.isSunk();
-  expect(yee.sunk).toBe(false);
+test('check sunk method works if not sunk', () => {
+  let boat = ship(3, 'cargo')
+  boat.hit()
+  boat.hit()
+  expect(boat.isSunk()).toBe(false);
 });
-test.skip('check sunk method works if sunk', () => {
-  let boat = ship(2, 'cargo');
-  boat.hit(1);
-  boat.hit(2);
-  boat.isSunk();
-  expect(boat.sunk).toBe(true);
+test('check sunk method works if sunk', () => {
+  let boat = ship(3, 'cargo')
+  boat.hit()
+  boat.hit()
+  boat.hit()
+  expect(boat.isSunk()).toBe(true);
 });

@@ -6,19 +6,15 @@ function ship(shipLength, shipName) {
     shipName,
     shipLength,
     sunk: false,
-    hit(position) {
-      if ((typeof position) !== 'number') {
-        throw ('Put number for Argument')
-      }
-      this['hit' + position.toString()] = true
+    hits: 0,
+    hit() {
+      this.hits++
     },
     isSunk() {
-      for (let j = 1; j <= shipLength; j++) {
-        if (this['hit' + j.toString()] == false) {
-          return;
-        }
-        this.sunk = true;
-
+      if (this.hits == this.shipLength) {
+        return true;
+      } else {
+        return false
       }
     }
   };
@@ -26,6 +22,6 @@ function ship(shipLength, shipName) {
   for (let i = 1; i <= shipLength; i++) {
     boat['hit' + i.toString()] = false;
   }
-    return boat;
-  }
-  module.exports = ship;
+  return boat;
+}
+module.exports = ship;

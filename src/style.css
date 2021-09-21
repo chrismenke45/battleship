@@ -27,3 +27,9 @@
 .occupied {
     background-color: blue;
 }
+.hidden {
+    display: none;
+}
+.thinking {
+    background-color: yellow;
+}

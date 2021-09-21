@@ -6,14 +6,24 @@ let playerBoard = gameboard();
 let computerBoard = gameboard();
 const playerBoardArea = document.getElementById('playerBoardArea');
 const computerBoardArea = document.getElementById('computerBoardArea');
+const computerSide = document.getElementById('computerSide');
+let playerCaption = document.getElementById('playerCaption');
+let computerCaption = document.getElementById('computerCaption');
 
-let cargo = ship(4, 'cargo');
-let patrol = ship(2, 'patrol');
-let aircraftCarrier = ship(5, 'aircraftCarrier');
-let submarine = ship(3, 'submarine');
+let cargo = ship(4, 'Cargo Ship');
+let patrol = ship(2, 'Patrol Boat');
+let aircraftCarrier = ship(5, 'Aircraft Carrier');
+let submarine = ship(3, 'Submarine');
 
 let randomSpot = function () {
     return Math.floor(Math.random() * 100);
+}
+
+let orientations = ['horizontal', 'vertical'];
+
+let randomOrientation = function (orientations) {
+    let choice = Math.floor(Math.random() * orientations.length);
+    return orientations[choice];
 }
 
 let boats = [aircraftCarrier, cargo, submarine, patrol]
@@ -36,40 +46,98 @@ computerBoard.spots.forEach((spot) => {
 
 })
 
-/*boats.forEach(boat => {
-    let x = randomSpot();
-    playerBoard.place(x, boat.shipLength, 'horizontal')
-})*/
-let squares = Array.from(document.getElementsByClassName("boardSquare"));
 
 let playerSquares = Array.from(document.getElementsByClassName("playerSquare"));
 let computerSquares = Array.from(document.getElementsByClassName("computerSquare"));
 
-playerBoard.place(0, patrol.shipLength, 'horizontal');
-playerBoard.place(8, aircraftCarrier.shipLength, 'vertical');
-playerBoard.place(75, submarine.shipLength, 'horizontal');
-playerBoard.place(81, cargo.shipLength, 'horizontal');
 
-playerBoard.spots.forEach((spot, index) => {
-    if (spot.occupied) {
-        playerSquares[index].classList.add('occupied');
-    }
+boats.forEach(boat => {
+    let canPlace = false;
+    do {
+        let direction = randomOrientation(orientations);
+        let coordinate = randomSpot();
+
+        if (computerBoard.availablePlacement(coordinate, boat.shipLength, direction)) {
+            computerBoard.place(coordinate, boat.shipLength, direction, boat.shipName);
+            canPlace = true;
+        }
+    } while (canPlace == false)
 })
 
-computerBoard.place(0, patrol.shipLength, 'horizontal');
-computerBoard.place(8, aircraftCarrier.shipLength, 'vertical');
-computerBoard.place(75, submarine.shipLength, 'horizontal');
-computerBoard.place(81, cargo.shipLength, 'horizontal');
+/*boats.forEach(boat => {
+    let canPlace = false;
+    do {let direction = randomOrientation(orientations);
+        let coordinate = randomSpot();
+        
+        if (playerBoard.availablePlacement(coordinate, boat.shipLength, direction)) {
+            playerBoard.place(coordinate, boat.shipLength, direction, boat.shipName);
+            canPlace = true;
+        }
+    } while (canPlace == false)
+})*/
 
+let shipsPlaced = 0;
+
+playerSquares.forEach(square => square.addEventListener('mouseenter', () => {
+    if (shipsPlaced < boats.length) {
+        for (let u = 0; u < boats[shipsPlaced].shipLength; u++) {
+            if (Number(square.id) + u * 10 >= 100) {
+                break;
+            }
+            playerSquares[Number(square.id) + u * 10].classList.add('thinking')
+        }
+    }
+}))
+playerSquares.forEach(square => square.addEventListener('mouseleave', () => {
+    if (shipsPlaced < boats.length) {
+        for (let u = 0; u < boats[shipsPlaced].shipLength; u++) {
+            if (Number(square.id) + u * 10 >= 100) {
+                break;
+            }
+            playerSquares[Number(square.id) + u * 10].classList.remove('thinking')
+        }
+    }
+}))
+playerCaption.innerHTML = 'Place your ' + boats[shipsPlaced].shipName;
+playerSquares.forEach(square => square.addEventListener('click', () => {
+    if (shipsPlaced < boats.length) {
+        if (playerBoard.availablePlacement((Number(square.id)), boats[shipsPlaced].shipLength, 'vertical')) {
+            playerBoard.place((Number(square.id)), boats[shipsPlaced].shipLength, 'vertical', boats[shipsPlaced].shipname);
+            playerBoard.spots.forEach((spot, index) => {
+                if (spot.occupied) {
+                    playerSquares[index].classList.add('occupied');
+                    playerSquares[index].classList.remove('thinking');
+                }
+            })
+            shipsPlaced++;
+            if (shipsPlaced >= boats.length) {
+                computerSide.classList.remove('hidden');
+                playerCaption.innerHTML = 'Player'
+            } else {
+                playerCaption.innerHTML = 'Place your ' + boats[shipsPlaced].shipName;
+            }
+        }
+    }
+}))
 
 
 computerSquares.forEach(square => square.addEventListener('click', () => {
+    computerCaption.innerHTML = 'Computer';
+    playerCaption.innerHTML = 'Player'
     if (computerBoard.spots[Number(square.id)].hit == true) {
         return;
     }
     computerBoard.receiveAttack(Number(square.id));
     if (computerBoard.spots[Number(square.id)].occupied == true) {
         square.classList.add('hitShip');
+        boats.forEach(boat => {
+            if (boat.shipName == computerBoard.spots[Number(square.id)].shipName) {
+                boat.hit()
+                if (boat.isSunk()) {
+                    computerCaption.innerHTML = 'The Computer\'s ' + boat.shipName + ' has been sunk';
+                }
+            }
+        })
     }
     square.innerHTML = 'X';
     let goodMove = false;
@@ -88,13 +156,3 @@ computerSquares.forEach(square => square.addEventListener('click', () => {
     } while (goodMove == false)
 }))
 
-/*squares.forEach(square => square.addEventListener('click', () => {
-    playerBoard.place(Number(square.id), patrol.shipLength, 'horizontal');
-    //square.classList.add('shipON');
-}))*/
-
-
-
-
-//let c = ship(4, 'yee');
-//console.log(c)

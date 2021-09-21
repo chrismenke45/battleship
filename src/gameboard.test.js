@@ -58,7 +58,7 @@ test.skip('check if place wont place when off map horizonatally', () => {
     expect(board.spots[90].occupied).toBe(false);
     expect(board.spots[78].occupied).toBe(false);
 });
-test.only('check if place adds shipname to spot', () => {
+test.skip('check if place adds shipname to spot', () => {
     let board = gameboard();
     let boat = ship(3,'cargo');
     board.place(85, boat.shipLength, 'horizontal', boat.shipName);
