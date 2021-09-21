@@ -10,6 +10,7 @@ const computerSide = document.getElementById('computerSide');
 let playerCaption = document.getElementById('playerCaption');
 let computerCaption = document.getElementById('computerCaption');
 let rotateBtn = document.getElementById('rotate');
+let resetBtn = document.getElementById('reset');
 
 let cargo = ship(4, 'Cargo Ship');
 let patrol = ship(2, 'Patrol Boat');
@@ -65,17 +66,49 @@ boats.forEach(boat => {
     } while (canPlace == false)
 })
 
-/*boats.forEach(boat => {
-    let canPlace = false;
-    do {let direction = randomOrientation(orientations);
-        let coordinate = randomSpot();
-        
-        if (playerBoard.availablePlacement(coordinate, boat.shipLength, direction)) {
-            playerBoard.place(coordinate, boat.shipLength, direction, boat.shipName);
-            canPlace = true;
-        }
-    } while (canPlace == false)
-})*/
+resetBtn.addEventListener('click', () => {
+    playerSquares.forEach(square => {
+        square.innerHTML = '';
+        square.className = '';
+        square.classList.add('boardSquare');
+        square.classList.add('playerSquare');
+    })
+    computerSquares.forEach(square => {
+        square.innerHTML = '';
+        square.className = '';
+        square.classList.add('boardSquare');
+        square.classList.add('playerSquare');
+        rotateBtn.classList.remove('hidden');
+    })
+    computerBoard.spots.forEach(spot => {
+        spot.occupied = false;
+        spot.hit = false;
+    })
+    playerBoard.spots.forEach(spot => {
+        spot.occupied = false;
+        spot.hit = false;
+    })
+    computerSinkCount = 0;
+    playerSinkCount =0;
+    boats.forEach(boat => {
+        boat.hits = 0;
+    })
+    shipsPlaced = 0;
+    computerSide.classList.add('hidden');
+    console.log('reset')
+    boats.forEach(boat => {
+        let canPlace = false;
+        do {
+            let direction = randomOrientation(orientations);
+            let coordinate = randomSpot();
+    
+            if (computerBoard.availablePlacement(coordinate, boat.shipLength, direction)) {
+                computerBoard.place(coordinate, boat.shipLength, direction, boat.shipName);
+                canPlace = true;
+            }
+        } while (canPlace == false)
+    })
+})
 
 let shipsPlaced = 0;
 let rotation = 'vertical';
@@ -142,7 +175,8 @@ playerSquares.forEach(square => square.addEventListener('click', () => {
             shipsPlaced++;
             if (shipsPlaced >= boats.length) {
                 computerSide.classList.remove('hidden');
-                playerCaption.innerHTML = 'Player'
+                playerCaption.innerHTML = 'Player';
+                rotateBtn.classList.add('hidden');
             } else {
                 playerCaption.innerHTML = 'Place your ' + boats[shipsPlaced].shipName;
             }
@@ -150,8 +184,19 @@ playerSquares.forEach(square => square.addEventListener('click', () => {
     }
 }))
 
+let computerSinkCount = 0;
+let playerSinkCount = 0;
+let playersAllowableHits = 0;
+boats.forEach(boat => {
+    playersAllowableHits += Number(boat.shipLength);
+})
+console.log(playersAllowableHits);
+
 
 computerSquares.forEach(square => square.addEventListener('click', () => {
+    if (computerSinkCount >= boats.length || playerSinkCount >= playersAllowableHits) {
+        return;
+    }
     computerCaption.innerHTML = 'Computer';
     playerCaption.innerHTML = 'Player'
     if (computerBoard.spots[Number(square.id)].hit == true) {
@@ -165,11 +210,16 @@ computerSquares.forEach(square => square.addEventListener('click', () => {
                 boat.hit()
                 if (boat.isSunk()) {
                     computerCaption.innerHTML = 'The Computer\'s ' + boat.shipName + ' has been sunk';
+                    computerSinkCount++;
+                    if(computerSinkCount == boats.length) {
+                        computerCaption.innerHTML = 'You Won!'
+                    }
                 }
             }
         })
     }
     square.innerHTML = 'X';
+  
     let goodMove = false;
     do {
         let spotChoice = randomSpot();
@@ -180,7 +230,11 @@ computerSquares.forEach(square => square.addEventListener('click', () => {
                 playerSquares[spotChoice].innerHTML = 'X';
                 if (playerBoard.spots[spotChoice].occupied == true) {
                     playerSquares[spotChoice].classList.add('hitShip');
-                }
+                    playerSinkCount++;
+                    if(playerSinkCount >= playersAllowableHits) {
+                        playerCaption.innerHTML = 'You Lost!'
+                    }
+                } 
             }, 300)
         }
     } while (goodMove == false)

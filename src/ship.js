@@ -19,9 +19,6 @@ function ship(shipLength, shipName) {
     }
   };
 
-  for (let i = 1; i <= shipLength; i++) {
-    boat['hit' + i.toString()] = false;
-  }
   return boat;
 }
 module.exports = ship;
